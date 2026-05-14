@@ -98,8 +98,8 @@ Method,  Endpoint,  Description
 
 ## API Key Note
 
-The assignment specifies an `X-API-KEY` header. The Frankfurter API is a free api and doesn't require authentication, but i have included a mock API key header in outgoing requests In a production environment, this middleware would validate incoming API keys against a whitelist or auth service.
+The assignment specifies an `X-API-KEY` header. But Frankfurter API is a free api and doesn't require any authentication, but i have included a mock API key header in outgoing requests. In a production environment, this middleware would validate incoming API keys against a whitelist or auth service.
 
 ## Author
 
-Built for the Constant Capital (Ghana) Limited by Prince Amoah
+This is a test app and was built for Constant Capital (Ghana) Limited by Prince Amoah.
