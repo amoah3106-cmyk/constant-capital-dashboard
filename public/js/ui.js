@@ -1,7 +1,3 @@
-/**
- * ui.js — DOM helpers and rendering functions
- */
-
 const UI = {
   // Element cache
   el: {},
@@ -183,16 +179,16 @@ const UI = {
       div.className = 'sidebar-item';
       div.dataset.base = item.base_currency;
       div.dataset.target = item.target_currency;
-      
+
       // Create content safely to prevent XSS
       const labelDiv = document.createElement('div');
       labelDiv.className = 'item-label';
       labelDiv.textContent = `${item.base_currency}/${item.target_currency}`;
-      
+
       const subDiv = document.createElement('div');
       subDiv.className = 'item-sub';
       subDiv.textContent = item.currency_name; // Use textContent to prevent XSS
-      
+
       const btnDiv = document.createElement('div');
       btnDiv.innerHTML = `
         <button class="item-remove" data-id="${item.id}" title="Remove">
@@ -201,11 +197,11 @@ const UI = {
           </svg>
         </button>
       `;
-      
+
       const contentWrapper = document.createElement('div');
       contentWrapper.appendChild(labelDiv);
       contentWrapper.appendChild(subDiv);
-      
+
       div.appendChild(contentWrapper);
       div.appendChild(btnDiv.firstElementChild);
       container.appendChild(div);
@@ -225,20 +221,20 @@ const UI = {
     history.forEach(item => {
       const div = document.createElement('div');
       div.className = 'sidebar-item';
-      
+
       // Create content safely to prevent XSS
       const labelDiv = document.createElement('div');
       labelDiv.className = 'item-label';
       labelDiv.textContent = `"${item.query}"`; // Use textContent to prevent XSS
-      
+
       const subDiv = document.createElement('div');
       subDiv.className = 'item-sub';
       subDiv.textContent = new Date(item.searched_at + 'Z').toLocaleString();
-      
+
       const contentWrapper = document.createElement('div');
       contentWrapper.appendChild(labelDiv);
       contentWrapper.appendChild(subDiv);
-      
+
       div.appendChild(contentWrapper);
       div.addEventListener('click', () => {
         this.el.searchInput.value = item.query;

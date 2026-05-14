@@ -7,18 +7,14 @@ const API = {
   baseUrl: '',
   timeout: 15000, // 15 seconds
 
-  /**
-   * Helper to create a timeout promise
-   */
+  // Helper to create a timeout promise
   createTimeout(ms) {
     return new Promise((_, reject) =>
       setTimeout(() => reject(new Error(`Request timeout after ${ms}ms`)), ms)
     );
   },
 
-  /**
-   * Helper to get CSRF token from cookie
-   */
+  // Helper to get CSRF token from cookie
   getCsrfToken() {
     const name = 'XSRF-TOKEN=';
     const decodedCookie = decodeURIComponent(document.cookie);
@@ -30,18 +26,16 @@ const API = {
     return '';
   },
 
-  /**
-   * Generic fetch wrapper with error handling, timeout, and retry logic
-   */
+  // Generic fetch wrapper with error handling, timeout, and retry logic
   async request(endpoint, options = {}) {
     const maxRetries = options.retries || 1;
     let lastError = null;
 
     // Add CSRF token for state-changing requests
     const method = (options.method || 'GET').toUpperCase();
-    const headers = { 
+    const headers = {
       'Content-Type': 'application/json',
-      ...options.headers 
+      ...options.headers
     };
 
     if (['POST', 'PUT', 'DELETE', 'PATCH'].includes(method)) {
@@ -55,7 +49,7 @@ const API = {
       try {
         const url = `${this.baseUrl}${endpoint}`;
         const controller = new AbortController();
-        
+
         const fetchPromise = fetch(url, {
           headers,
           signal: controller.signal,

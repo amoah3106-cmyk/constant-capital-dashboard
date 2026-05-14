@@ -1,15 +1,9 @@
-/**
- * chart.js — Chart.js integration for historical rate charts
- */
-
 const RateChart = {
   chart: null,
   currentPair: null,
   currentDays: 30,
 
-  /**
-   * Load and render historical data for a currency pair
-   */
+  // Load and render historical data for a currency pair
   async load(from, to, days) {
     if (!from || !to) {
       UI.toast('Invalid currency pair', 'error');
@@ -30,7 +24,7 @@ const RateChart = {
 
     try {
       const result = await API.getHistory(from, to, this.currentDays);
-      
+
       if (!result.data || !result.data.rates) {
         throw new Error('Invalid data received from server');
       }
@@ -63,9 +57,7 @@ const RateChart = {
     }
   },
 
-  /**
-   * Render or update the Chart.js line chart
-   */
+  // Render or update the Chart.js line chart
   render(labels, data, from, to) {
     const ctx = document.getElementById('rate-chart').getContext('2d');
 
@@ -125,7 +117,7 @@ const RateChart = {
             titleFont: { family: 'Inter', weight: '600' },
             bodyFont: { family: 'Inter' },
             callbacks: {
-              label: function(context) {
+              label: function (context) {
                 return `Rate: ${context.parsed.y.toFixed(4)}`;
               }
             }
@@ -143,7 +135,7 @@ const RateChart = {
             grid: { color: 'rgba(255,255,255,0.03)', drawBorder: false },
             ticks: {
               color: '#64748b', font: { family: 'Inter', size: 11 },
-              callback: function(val) { return val.toFixed(4); }
+              callback: function (val) { return val.toFixed(4); }
             }
           }
         }
@@ -151,9 +143,7 @@ const RateChart = {
     });
   },
 
-  /**
-   * Change the time period and reload
-   */
+  // Change the time period and reload
   async changePeriod(days) {
     if (!this.currentPair) return;
     this.currentDays = days;

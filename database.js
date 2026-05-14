@@ -29,9 +29,7 @@ try {
   throw new Error(`Database initialization failed: ${err.message}`);
 }
 
-// ─────────────────────────────────────────────────
 // Schema Initialization
-// ─────────────────────────────────────────────────
 
 try {
   db.exec(`
@@ -63,17 +61,11 @@ try {
   throw new Error(`Schema initialization failed: ${err.message}`);
 }
 
-// ─────────────────────────────────────────────────
 // Cache Helpers
-// ─────────────────────────────────────────────────
 
 const CACHE_TTL_MS = parseInt(process.env.CACHE_TTL_MS) || 3600000; // 1 hour
 
-/**
- * Get cached response if it exists and hasn't expired.
- * @param {string} key - Cache key (e.g., URL or query identifier)
- * @returns {object|null} Parsed JSON response or null
- */
+
 function getCachedResponse(key) {
   try {
     const row = db.prepare(
@@ -98,11 +90,7 @@ function getCachedResponse(key) {
   }
 }
 
-/**
- * Store a response in the cache.
- * @param {string} key - Cache key
- * @param {object} data - Response data to cache
- */
+
 function setCachedResponse(key, data) {
   try {
     db.prepare(`
@@ -115,15 +103,10 @@ function setCachedResponse(key, data) {
   }
 }
 
-// ─────────────────────────────────────────────────
-// Search History Helpers
-// ─────────────────────────────────────────────────
 
-/**
- * Save a search query to history.
- * Keeps only the last 10 entries.
- * @param {string} query - Search text
- */
+// Search History Helpers
+
+
 function addSearchHistory(query) {
   try {
     const trimmed = query.trim();
@@ -144,10 +127,7 @@ function addSearchHistory(query) {
   }
 }
 
-/**
- * Get the last 10 search queries.
- * @returns {Array} Search history entries
- */
+
 function getSearchHistory() {
   try {
     return db.prepare(
@@ -159,9 +139,7 @@ function getSearchHistory() {
   }
 }
 
-/**
- * Clear all search history.
- */
+
 function clearSearchHistory() {
   try {
     db.prepare('DELETE FROM search_history').run();
@@ -171,23 +149,15 @@ function clearSearchHistory() {
   }
 }
 
-// ─────────────────────────────────────────────────
-// Watchlist Helpers
-// ─────────────────────────────────────────────────
 
-/**
- * Add a currency pair to the watchlist.
- * Max 10 entries enforced.
- * @param {string} base - Base currency code (e.g., "USD")
- * @param {string} target - Target currency code (e.g., "EUR")
- * @param {string} name - Currency name (e.g., "Euro")
- * @returns {object} Result with success flag
- */
+// Watchlist Helpers
+
+
 function addToWatchlist(base, target, name) {
   try {
     const countRow = db.prepare('SELECT COUNT(*) as cnt FROM watchlist').get();
     const count = countRow?.cnt || 0;
-    
+
     if (count >= 10) {
       return { success: false, error: 'Watchlist is full (max 10 pairs)' };
     }
@@ -196,7 +166,64 @@ function addToWatchlist(base, target, name) {
       INSERT INTO watchlist (base_currency, target_currency, currency_name)
       VALUES (?, ?, ?)
     `).run(base, target, name);
-    
+
+    return { success: true };
+  } catch (err) {
+    console.error('[Watchlist] Add error:', err.message);
+    if (err.message.includes('UNIQUE constraint')) {
+      return { success: false, error: 'Pair already in watchlist' };
+    }
+    throw err;
+  }
+}
+
+
+function removeFromWatchlist(id) {
+  try {
+    const result = db.prepare('DELETE FROM watchlist WHERE id = ?').run(id);
+    return { success: result.changes > 0 };
+  } catch (err) {
+    console.error('[Watchlist] Remove error:', err.message);
+    throw err;
+  }
+}
+
+
+function getWatchlist() {
+  try {
+    return db.prepare('SELECT * FROM watchlist ORDER BY id DESC').all() || [];
+  } catch (err) {
+    console.error('[Watchlist] Error fetching:', err.message);
+    return [];
+  }
+}
+
+
+module.exports = {
+  getCachedResponse,
+  setCachedResponse,
+  addSearchHistory,
+  getSearchHistory,
+  clearSearchHistory,
+  addToWatchlist,
+  removeFromWatchlist,
+  getWatchlist
+};
+
+function addToWatchlist(base, target, name) {
+  try {
+    const countRow = db.prepare('SELECT COUNT(*) as cnt FROM watchlist').get();
+    const count = countRow?.cnt || 0;
+
+    if (count >= 10) {
+      return { success: false, error: 'Watchlist is full (max 10 pairs)' };
+    }
+
+    db.prepare(`
+      INSERT INTO watchlist (base_currency, target_currency, currency_name)
+      VALUES (?, ?, ?)
+    `).run(base, target, name);
+
     return { success: true };
   } catch (err) {
     console.error('[Watchlist] Add error:', err.message);
@@ -207,10 +234,9 @@ function addToWatchlist(base, target, name) {
   }
 }
 
-/**
- * Remove a currency pair from the watchlist.
- * @param {number} id - Watchlist entry ID
- */
+
+// Remove a currency pair from the watchlist.
+
 function removeFromWatchlist(id) {
   try {
     db.prepare('DELETE FROM watchlist WHERE id = ?').run(id);
@@ -219,10 +245,9 @@ function removeFromWatchlist(id) {
   }
 }
 
-/**
- * Get all watchlist entries.
- * @returns {Array} Watchlist entries
- */
+
+//Get all watchlist entries.
+
 function getWatchlist() {
   try {
     return db.prepare(
@@ -234,12 +259,9 @@ function getWatchlist() {
   }
 }
 
-/**
- * Check if a pair exists in the watchlist.
- * @param {string} base - Base currency code
- * @param {string} target - Target currency code
- * @returns {boolean}
- */
+
+// Check if a pair exists in the watchlist.
+
 function isInWatchlist(base, target) {
   try {
     const row = db.prepare(

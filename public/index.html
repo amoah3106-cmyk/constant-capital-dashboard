@@ -1,33 +1,49 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Constant Capital FX Dashboard — Real-time currency exchange rates, historical charts, and personalized watchlists.">
+  <meta name="description"
+    content="Constant Capital Dashboard — Real-time currency exchange rates, historical charts, and personalized watchlists.">
   <title>Constant Capital Dashboard</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+    rel="stylesheet">
   <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js"></script>
   <link rel="stylesheet" href="/css/styles.css">
 </head>
+
 <body>
   <header id="app-header">
     <div class="header-left">
       <div class="logo" id="logo">
         <svg width="32" height="32" viewBox="0 0 32 32" fill="none">
-          <rect width="32" height="32" rx="8" fill="url(#lg)"/>
-          <path d="M8 16L14 10L20 16L26 10" stroke="#fff" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
-          <path d="M8 22L14 16L20 22L26 16" stroke="rgba(255,255,255,0.5)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-          <defs><linearGradient id="lg" x1="0" y1="0" x2="32" y2="32"><stop stop-color="#D4A843"/><stop offset="1" stop-color="#B8860B"/></linearGradient></defs>
+          <rect width="32" height="32" rx="8" fill="url(#lg)" />
+          <path d="M8 16L14 10L20 16L26 10" stroke="#fff" stroke-width="2.5" stroke-linecap="round"
+            stroke-linejoin="round" />
+          <path d="M8 22L14 16L20 22L26 16" stroke="rgba(255,255,255,0.5)" stroke-width="2" stroke-linecap="round"
+            stroke-linejoin="round" />
+          <defs>
+            <linearGradient id="lg" x1="0" y1="0" x2="32" y2="32">
+              <stop stop-color="#D4A843" />
+              <stop offset="1" stop-color="#B8860B" />
+            </linearGradient>
+          </defs>
         </svg>
       </div>
-      <div class="header-title"><h1>Constant Capital</h1><span class="header-subtitle">Dashboard</span></div>
+      <div class="header-title">
+        <h1>Constant Capital</h1><span class="header-subtitle">Dashboard</span>
+      </div>
     </div>
 
     <div class="header-right">
-      <div class="base-currency-selector"><label for="base-currency">Base</label><select id="base-currency"><option value="USD" selected>USD</option></select></div>
-      <div class="connection-status" id="connection-status"><span class="status-dot"></span><span class="status-text">Live</span></div>
+      <div class="base-currency-selector"><label for="base-currency">Base</label><select id="base-currency">
+          <option value="USD" selected>USD</option>
+        </select></div>
+      <div class="connection-status" id="connection-status"><span class="status-dot"></span><span
+          class="status-text">Live</span></div>
     </div>
 
   </header>
@@ -35,57 +51,130 @@
   <main id="app-main">
     <aside id="sidebar">
       <div class="sidebar-section" id="watchlist-section">
-        <div class="section-header"><h2><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> Watchlist</h2><span class="badge" id="watchlist-count">0</span></div>
-        <div id="watchlist-items" class="sidebar-items"><div class="empty-state" id="watchlist-empty"><p>No currencies watched</p><span>Click ⭐ to add</span></div></div>
+        <div class="section-header">
+          <h2><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polygon
+                points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" />
+            </svg> Watchlist</h2><span class="badge" id="watchlist-count">0</span>
+        </div>
+        <div id="watchlist-items" class="sidebar-items">
+          <div class="empty-state" id="watchlist-empty">
+            <p>No currencies watched</p><span>Click ⭐ to add</span>
+          </div>
+        </div>
       </div>
       <div class="sidebar-section" id="history-section">
         <div class="section-header">
-          <h2><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> Recent Searches</h2>
+          <h2><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg> Recent Searches</h2>
           <button id="clear-history" class="clear-btn" title="Clear history">Clear</button>
         </div>
-        <div id="history-items" class="sidebar-items"><div class="empty-state" id="history-empty"><p>No recent searches</p></div></div>
+        <div id="history-items" class="sidebar-items">
+          <div class="empty-state" id="history-empty">
+            <p>No recent searches</p>
+          </div>
+        </div>
       </div>
-      <button id="sidebar-toggle" class="sidebar-toggle" aria-label="Toggle sidebar"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg></button>
+      <button id="sidebar-toggle" class="sidebar-toggle" aria-label="Toggle sidebar"><svg width="20" height="20"
+          viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="3" y1="12" x2="21" y2="12" />
+          <line x1="3" y1="6" x2="21" y2="6" />
+          <line x1="3" y1="18" x2="21" y2="18" />
+        </svg></button>
     </aside>
 
     <div id="content">
       <div class="search-container" id="search-container">
         <div class="search-wrapper">
-          <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <svg class="search-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2">
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+          </svg>
           <input type="text" id="search-input" placeholder="Search currencies by name or code..." autocomplete="off">
-          <button id="search-clear" class="search-clear hidden" aria-label="Clear search"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+          <button id="search-clear" class="search-clear hidden" aria-label="Clear search"><svg width="16" height="16"
+              viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="18" y1="6" x2="6" y2="18" />
+              <line x1="6" y1="6" x2="18" y2="18" />
+            </svg></button>
         </div>
       </div>
 
       <div class="info-bar" id="info-bar">
-        <div class="info-left"><span id="rates-count">0 currencies</span><span class="info-sep">•</span><span id="last-updated">Loading...</span></div>
+        <div class="info-left"><span id="rates-count">0 currencies</span><span class="info-sep">•</span><span
+            id="last-updated">Loading...</span></div>
         <div class="info-right"><span id="cache-status" class="cache-badge"></span></div>
       </div>
 
       <div id="error-banner" class="error-banner hidden">
-        <div class="error-content"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg><span id="error-message">An error occurred</span></div>
+        <div class="error-content"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+            stroke-width="2">
+            <circle cx="12" cy="12" r="10" />
+            <line x1="15" y1="9" x2="9" y2="15" />
+            <line x1="9" y1="9" x2="15" y2="15" />
+          </svg><span id="error-message">An error occurred</span></div>
         <button id="error-retry" class="error-retry">Retry</button>
-        <button id="error-dismiss" class="error-dismiss" aria-label="Dismiss"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+        <button id="error-dismiss" class="error-dismiss" aria-label="Dismiss"><svg width="16" height="16"
+            viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <line x1="18" y1="6" x2="6" y2="18" />
+            <line x1="6" y1="6" x2="18" y2="18" />
+          </svg></button>
       </div>
 
-      <div id="loading-skeleton" class="loading-skeleton"><div class="skeleton-row"></div><div class="skeleton-row"></div><div class="skeleton-row"></div><div class="skeleton-row"></div><div class="skeleton-row"></div></div>
+      <div id="loading-skeleton" class="loading-skeleton">
+        <div class="skeleton-row"></div>
+        <div class="skeleton-row"></div>
+        <div class="skeleton-row"></div>
+        <div class="skeleton-row"></div>
+        <div class="skeleton-row"></div>
+      </div>
       <div class="chart-container" id="chart-container">
         <div class="chart-header">
-          <div class="chart-title-group"><h2 id="chart-title">Historical Exchange Rate</h2><span id="chart-subtitle" class="chart-subtitle">Select a currency to view trends</span></div>
-          <div class="chart-controls"><button class="chart-period active" data-days="7">7D</button><button class="chart-period" data-days="30">30D</button><button class="chart-period" data-days="90">90D</button><button class="chart-period" data-days="180">6M</button></div>
+          <div class="chart-title-group">
+            <h2 id="chart-title">Historical Exchange Rate</h2><span id="chart-subtitle" class="chart-subtitle">Select a
+              currency to view trends</span>
+          </div>
+          <div class="chart-controls"><button class="chart-period active" data-days="7">7D</button><button
+              class="chart-period" data-days="30">30D</button><button class="chart-period"
+              data-days="90">90D</button><button class="chart-period" data-days="180">6M</button></div>
         </div>
         <div class="chart-wrapper" id="chart-wrapper">
           <canvas id="rate-chart"></canvas>
-          <div id="chart-loading" class="chart-loading hidden"><div class="spinner"></div><span>Loading chart data...</span></div>
-          <div id="chart-placeholder" class="chart-placeholder"><svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.3"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg><p>Click 📊 next to any currency to view its historical trend</p></div>
+          <div id="chart-loading" class="chart-loading hidden">
+            <div class="spinner"></div><span>Loading chart data...</span>
+          </div>
+          <div id="chart-placeholder" class="chart-placeholder"><svg width="64" height="64" viewBox="0 0 24 24"
+              fill="none" stroke="currentColor" stroke-width="1.5" opacity="0.3">
+              <polyline points="22 12 18 12 15 21 9 3 6 12 2 12" />
+            </svg>
+            <p>Click 📊 next to any currency to view its historical trend</p>
+          </div>
         </div>
       </div>
 
       <div class="table-container" id="table-container">
-        <table id="rates-table"><thead><tr><th class="th-code">Code</th><th class="th-name">Currency</th><th class="th-rate">Rate</th><th class="th-actions">Actions</th></tr></thead><tbody id="rates-body"></tbody></table>
-        <div id="no-results" class="no-results hidden"><svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg><p>No currencies match your search</p></div>
+        <table id="rates-table">
+          <thead>
+            <tr>
+              <th class="th-code">Code</th>
+              <th class="th-name">Currency</th>
+              <th class="th-rate">Rate</th>
+              <th class="th-actions">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="rates-body"></tbody>
+        </table>
+        <div id="no-results" class="no-results hidden"><svg width="48" height="48" viewBox="0 0 24 24" fill="none"
+            stroke="currentColor" stroke-width="1.5">
+            <circle cx="11" cy="11" r="8" />
+            <line x1="21" y1="21" x2="16.65" y2="16.65" />
+          </svg>
+          <p>No currencies match your search</p>
+        </div>
       </div>
-      
+
     </div>
   </main>
 
@@ -96,4 +185,5 @@
   <script src="/js/chart.js"></script>
   <script src="/js/app.js"></script>
 </body>
+
 </html>

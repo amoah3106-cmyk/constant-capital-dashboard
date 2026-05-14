@@ -1,16 +1,3 @@
-/**
- * server.js — Express server with API routes
- * 
- * Routes:
- *   GET  /api/rates?base=USD         — Latest exchange rates (cached)
- *   GET  /api/currencies             — All available currencies (cached)
- *   GET  /api/history?from=X&to=Y&days=30  — Historical rates
- *   GET  /api/search-history         — Recent searches
- *   POST /api/search-history         — Save a search query
- *   GET  /api/watchlist              — Get watchlist
- *   POST /api/watchlist              — Add pair to watchlist
- *   DELETE /api/watchlist/:id        — Remove from watchlist
- */
 
 require('dotenv').config();
 const express = require('express');
@@ -39,9 +26,9 @@ const ALLOWED_ORIGINS = (process.env.ALLOWED_ORIGINS || 'http://localhost:3000')
 const FRANKFURTER_API_KEY = process.env.FRANKFURTER_API_KEY || '';
 const TIMEOUT_MS = parseInt(process.env.TIMEOUT_MS) || 10000;
 
-// ─────────────────────────────────────────────────
+
 // Security Middleware: HTTPS Redirect (production)
-// ─────────────────────────────────────────────────
+
 if (NODE_ENV === 'production') {
   app.use((req, res, next) => {
     if (req.header('x-forwarded-proto') !== 'https') {
@@ -52,15 +39,14 @@ if (NODE_ENV === 'production') {
   });
 }
 
-// ─────────────────────────────────────────────────
 // Security Middleware: Request Size Limits
-// ─────────────────────────────────────────────────
+
 app.use(express.json({ limit: '1kb' }));
 app.use(express.urlencoded({ limit: '1kb', extended: false }));
 
-// ─────────────────────────────────────────────────
+
 // Security Middleware: CORS (Restricted)
-// ─────────────────────────────────────────────────
+
 app.use(cors({
   origin: ALLOWED_ORIGINS,
   credentials: true,
@@ -69,19 +55,19 @@ app.use(cors({
   maxAge: 3600
 }));
 
-// ─────────────────────────────────────────────────
+
 // Security Middleware: Security Headers
-// ─────────────────────────────────────────────────
+
 app.use((req, res, next) => {
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('X-Frame-Options', 'DENY');
   res.setHeader('X-XSS-Protection', '1; mode=block');
   res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
   res.setHeader('Permissions-Policy', 'geolocation=(), microphone=(), camera=()');
-  
+
   if (NODE_ENV === 'production') {
     res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
-    res.setHeader('Content-Security-Policy', 
+    res.setHeader('Content-Security-Policy',
       "default-src 'self'; " +
       "script-src 'self' https://cdn.jsdelivr.net; " +
       "style-src 'self' https://fonts.googleapis.com 'unsafe-inline'; " +
@@ -93,9 +79,9 @@ app.use((req, res, next) => {
   next();
 });
 
-// ─────────────────────────────────────────────────
+
 // Security Middleware: Rate Limiting
-// ─────────────────────────────────────────────────
+
 const generalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
   max: 100, // 100 requests per window
@@ -115,9 +101,9 @@ const apiLimiter = rateLimit({
 app.use(generalLimiter);
 app.use('/api/', apiLimiter);
 
-// ─────────────────────────────────────────────────
+
 // Security Middleware: CSRF Protection
-// ─────────────────────────────────────────────────
+
 app.use(cookieParser());
 const csrfProtection = csrf({ cookie: true });
 
@@ -132,27 +118,23 @@ app.use((req, res, next) => {
   next();
 });
 
-// ─────────────────────────────────────────────────
-// Static Files
-// ─────────────────────────────────────────────────
-app.use(express.static(path.join(__dirname, 'public')));
 
-// ─────────────────────────────────────────────────
+// Static Files
+
+app.use(express.static(path.join(__dirname, 'public')));
 // Middleware: Mock API Key check (demonstrates understanding)
-// ─────────────────────────────────────────────────
+
 app.use('/api', (req, res, next) => {
   // In production, you would validate X-API-KEY here.
   // For this demo, we accept all requests.
   next();
 });
 
-// ─────────────────────────────────────────────────
-// Validation Helpers
-// ─────────────────────────────────────────────────
 
-/**
- * Validate and sanitize currency code (must be 3-letter code)
- */
+// Validation Helpers
+
+
+
 function validateCurrency(code) {
   const upper = String(code).toUpperCase().trim();
   if (!/^[A-Z]{3}$/.test(upper)) {
@@ -161,17 +143,15 @@ function validateCurrency(code) {
   return upper;
 }
 
-/**
- * Validate days parameter (between 1 and 365)
- */
+// Validate days parameter (between 1 and 365)
 function validateDays(days) {
   const parsed = parseInt(days) || 30;
   return Math.min(Math.max(parsed, 1), 365);
 }
 
-/**
- * Sanitize string input (max 100 chars, trim whitespace)
- */
+
+// Sanitize string input (max 100 chars, trim whitespace)
+
 function sanitizeString(str, maxLength = 100) {
   if (typeof str !== 'string') {
     throw new Error('Input must be a string');
@@ -186,9 +166,9 @@ function sanitizeString(str, maxLength = 100) {
   return trimmed;
 }
 
-/**
- * Format error response (hides details in production)
- */
+
+//Format error response (hides details in production)
+
 function formatError(err, status = 500) {
   const isDev = NODE_ENV === 'development';
   return {
@@ -198,9 +178,9 @@ function formatError(err, status = 500) {
   };
 }
 
-// ─────────────────────────────────────────────────
+
 // Helper: Fetch from Frankfurter with caching
-// ─────────────────────────────────────────────────
+
 async function fetchWithCache(cacheKey, url) {
   // Check cache first
   const cached = getCachedResponse(cacheKey);
@@ -257,9 +237,9 @@ async function fetchWithCache(cacheKey, url) {
   }
 }
 
-// ─────────────────────────────────────────────────
+
 // GET /api/currencies — List all currencies
-// ─────────────────────────────────────────────────
+
 app.get('/api/currencies', async (req, res) => {
   try {
     const { data, fromCache } = await fetchWithCache(
@@ -273,9 +253,9 @@ app.get('/api/currencies', async (req, res) => {
   }
 });
 
-// ─────────────────────────────────────────────────
+
 // GET /api/rates?base=USD — Latest exchange rates
-// ─────────────────────────────────────────────────
+
 app.get('/api/rates', async (req, res) => {
   try {
     const base = validateCurrency(req.query.base || 'USD');
@@ -291,9 +271,9 @@ app.get('/api/rates', async (req, res) => {
   }
 });
 
-// ─────────────────────────────────────────────────
+
 // GET /api/history?from=USD&to=EUR&days=30
-// ─────────────────────────────────────────────────
+
 app.get('/api/history', async (req, res) => {
   try {
     const from = validateCurrency(req.query.from || 'USD');
@@ -321,9 +301,9 @@ app.get('/api/history', async (req, res) => {
   }
 });
 
-// ─────────────────────────────────────────────────
+
 // GET /api/search-history
-// ─────────────────────────────────────────────────
+
 app.get('/api/search-history', (req, res) => {
   try {
     const history = getSearchHistory();
@@ -334,13 +314,12 @@ app.get('/api/search-history', (req, res) => {
   }
 });
 
-// ─────────────────────────────────────────────────
 // POST /api/search-history — { query: "euro" }
-// ─────────────────────────────────────────────────
+
 app.post('/api/search-history', (req, res) => {
   try {
     const { query } = req.body;
-    
+
     // Validate query input
     if (!query || typeof query !== 'string') {
       return res.status(400).json({
@@ -348,7 +327,7 @@ app.post('/api/search-history', (req, res) => {
         error: 'Query must be a non-empty string'
       });
     }
-    
+
     const sanitized = sanitizeString(query, 100);
     addSearchHistory(sanitized);
     res.json({ success: true });
@@ -358,9 +337,9 @@ app.post('/api/search-history', (req, res) => {
   }
 });
 
-// ─────────────────────────────────────────────────
+
 // DELETE /api/search-history
-// ─────────────────────────────────────────────────
+
 app.delete('/api/search-history', (req, res) => {
   try {
     clearSearchHistory();
@@ -371,9 +350,7 @@ app.delete('/api/search-history', (req, res) => {
   }
 });
 
-// ─────────────────────────────────────────────────
 // GET /api/watchlist
-// ─────────────────────────────────────────────────
 app.get('/api/watchlist', (req, res) => {
   try {
     const watchlist = getWatchlist();
@@ -384,13 +361,13 @@ app.get('/api/watchlist', (req, res) => {
   }
 });
 
-// ─────────────────────────────────────────────────
+
 // POST /api/watchlist — { base, target, name }
-// ─────────────────────────────────────────────────
+
 app.post('/api/watchlist', (req, res) => {
   try {
     const { base, target, name } = req.body;
-    
+
     // Validate all required fields
     if (!base || !target || !name) {
       return res.status(400).json({
@@ -398,12 +375,12 @@ app.post('/api/watchlist', (req, res) => {
         error: 'base, target, and name are required'
       });
     }
-    
+
     // Validate and sanitize inputs
     const validatedBase = validateCurrency(base);
     const validatedTarget = validateCurrency(target);
     const sanitizedName = sanitizeString(name, 100);
-    
+
     const result = addToWatchlist(validatedBase, validatedTarget, sanitizedName);
     if (!result.success) {
       return res.status(409).json(result);
@@ -415,9 +392,9 @@ app.post('/api/watchlist', (req, res) => {
   }
 });
 
-// ─────────────────────────────────────────────────
+
 // DELETE /api/watchlist/:id
-// ─────────────────────────────────────────────────
+
 app.delete('/api/watchlist/:id', (req, res) => {
   try {
     const id = parseInt(req.params.id);
@@ -435,16 +412,12 @@ app.delete('/api/watchlist/:id', (req, res) => {
   }
 });
 
-// ─────────────────────────────────────────────────
 // Fallback: Serve index.html for SPA
-// ─────────────────────────────────────────────────
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// ─────────────────────────────────────────────────
 // Error Handling Middleware: 404
-// ─────────────────────────────────────────────────
 app.use((req, res) => {
   res.status(404).json({
     success: false,
@@ -452,13 +425,11 @@ app.use((req, res) => {
   });
 });
 
-// ─────────────────────────────────────────────────
 // Error Handling Middleware: Global (last)
-// ─────────────────────────────────────────────────
 app.use((err, req, res, next) => {
   const isDev = NODE_ENV === 'development';
   const statusCode = err.statusCode || err.status || 500;
-  
+
   console.error(`[${new Date().toISOString()}] Error:`, {
     message: err.message,
     status: statusCode,
@@ -466,20 +437,18 @@ app.use((err, req, res, next) => {
     method: req.method,
     ...(isDev && { stack: err.stack, body: req.body })
   });
-  
+
   // Don't expose stack traces in production
   const response = {
     success: false,
     error: isDev ? err.message : 'Internal server error',
     ...(isDev && { stack: err.stack })
   };
-  
+
   res.status(statusCode).json(response);
 });
 
-// ─────────────────────────────────────────────────
 // Start Server with Error Handling
-// ─────────────────────────────────────────────────
 const server = app.listen(PORT, () => {
   console.log(`\n  🏛️  Constant Capital FX Dashboard`);
   console.log(`  ─────────────────────────────────`);
@@ -488,9 +457,7 @@ const server = app.listen(PORT, () => {
   console.log(`  Database:   ./data/app.db\n`);
 });
 
-// ─────────────────────────────────────────────────
 // Process-Level Error Handlers
-// ─────────────────────────────────────────────────
 
 // Handle uncaught exceptions
 process.on('uncaughtException', (err) => {
@@ -517,7 +484,7 @@ process.on('SIGTERM', () => {
     console.log('Server closed');
     process.exit(0);
   });
-  
+
   // Force shutdown after 10 seconds
   setTimeout(() => {
     console.error('Forced shutdown');
