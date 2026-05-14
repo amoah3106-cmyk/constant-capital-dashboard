@@ -1,0 +1,38 @@
+{
+  "name": "constant-capital-fx-dashboard",
+  "version": "1.0.0",
+  "description": "Currency Exchange Dashboard — Constant Capital (Ghana) Limited Interview Assignment",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "test": "node tests/error-handling.js"
+  },
+  "keywords": [
+    "exchange-rates",
+    "currency",
+    "dashboard",
+    "express",
+    "sqlite",
+    "chart.js"
+  ],
+  "author": "Interview Candidate",
+  "license": "MIT",
+  "dependencies": {
+    "better-sqlite3": "^11.7.0",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "csurf": "^1.2.2",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "express-rate-limit": "^8.5.1",
+    "node-fetch": "^2.7.0"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/constant-capital-fx-dashboard"
+  }
+}
